@@ -210,6 +210,7 @@ def api_obtenerdiscos():
         return jsonify(rpta)
 
 @app.route("/api_zavaletaroger_simularprestamo", methods=["POST"])
+@jwt_required()
 def api_zavaletaroger_simularprestamo():
     try:
         capital = request.json["capital"]
