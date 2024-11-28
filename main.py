@@ -209,41 +209,51 @@ def api_obtenerdiscos():
         rpta["status"] = -1
         return jsonify(rpta)
 
-@app.route("/api_juniorcachay_simularprestamo", methods=["POST"])
-def api_juniorcachay_simularprestamo():
-    capital = request.json["capital"]
-    tasaimensual = request.json["tasaimensual"]
-    cantidadmeses = request.json["cantidadmeses"]
+@app.route("/api_zavaletaroger_simularprestamo", methods=["POST"])
+def api_zavaletaroger_simularprestamo():
+    try:
+        capital = request.json["capital"]
+        tasaimensual = request.json["tasaimensual"]
+        cantidadmeses = request.json["cantidadmeses"]
 
-    capitalmes = capital / cantidadmeses
-    rpta = dict()
+        data = {
+            "fecha_simulacion": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "capital": capital,
+            "tasa_mensual": tasaimensual,
+            "cantidad_meses": cantidadmeses,
+            "cuotas": []
+        }
 
-    data = dict()
-    data["fechasimulacion"] = datetime.now()
-    cuotas = list()
-    total = 0.0
-    itotal = 0.0
-    for i in range(cantidadmeses):
-        cuota = dict()
-        cuota["mes"] = "Mes %s" % (i+1)
-        cuota["capital"] = capitalmes
-        cuota["interes"] = (capital - (capitalmes * i)) * (tasaimensual/100)
-        cuota["total"] = cuota["capital"] + cuota["interes"]
-        total += cuota["total"]
-        cuotas.append(cuota)
-    itotal = total - capital
-    data["cuotas"] = cuotas
-    data["total"] = total
-    data["itotal"] = itotal
+        capitalmes = capital / cantidadmeses
+        total = 0.0
+        rpta = dict()
 
-    rpta["data"] = data
-    rpta["message"] = "Simulación generada correctamente"
-    rpta["status"] = 1
+        for i in range(cantidadmeses):
+            interes = round((capital - (capitalmes * i)) * (tasaimensual / 100), 2)
+            total_cuota = round(capitalmes + interes, 2)
+            data["cuotas"].append({
+                "mes": f"Mes {i + 1}",
+                "capital": round(capitalmes, 2),
+                "interes": interes,
+                "total": total_cuota
+            })
+            total += total_cuota
 
-    idsimulacion = controlador_simulacion.insertar_simulacion(data, tasaimensual, cantidadmeses)
-    data["idsimulacion"] = idsimulacion
+        data["total"] = round(total, 2)
+        data["itotal"] = round(total - capital, 2)
 
-    return jsonify(rpta)
+        id_simulacion = controlador_simulacion.insertar_simulacion(data)
+        data["idsimulacion"] = id_simulacion
+
+        rpta["data"] = data
+        rpta["message"] = "Simulación generada correctamente"
+        rpta["status"] = 1
+
+        # Return response
+        return jsonify(rpta), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e), "status": 0}), 500
 
 ##### APIs - INICIO #####
 

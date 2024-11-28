@@ -1,14 +1,22 @@
 from bd import obtener_conexion
 
-def insertar_simulacion(data, tasaimensual, cantidadmeses):
+def insertar_simulacion(data):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("INSERT INTO simulacion(fechasimulacion, total, itotal, tasaimensual, cantidadmeses) VALUES (%s, %s, %s, %s, %s)",
-                       (data["fechasimulacion"], data["total"], data["itotal"], tasaimensual, cantidadmeses))
-        idsimulacion = conexion.insert_id()
+        cursor.execute(
+            "INSERT INTO Simulacion (fecha_simulacion, capital, tasa_mensual, cantidad_meses) "
+            "VALUES (%s, %s, %s, %s)",
+            (data["fecha_simulacion"], data["capital"], data["tasa_mensual"], data["cantidad_meses"])
+        )
+        id_simulacion = cursor.lastrowid
+
         for cuota in data["cuotas"]:
-            cursor.execute("INSERT INTO detallesimulacion(idsimulacion, mes, capital, interes, total) VALUES (%s, %s, %s, %s, %s)",
-                       (idsimulacion, cuota["mes"], cuota["capital"], cuota["interes"], cuota["total"]))
+            cursor.execute(
+                "INSERT INTO DetallesCuotas (id_simulacion, mes, capital, interes, total_cuota) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                (id_simulacion, cuota["mes"], cuota["capital"], cuota["interes"], cuota["total"])
+            )
+
     conexion.commit()
     conexion.close()
-    return idsimulacion
+    return id_simulacion
