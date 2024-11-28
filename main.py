@@ -23,7 +23,7 @@ def authenticate(username, password):
     if data:
         user = User(data[0], data[1], data[2])
         password_hash = encstringsha256(password)
-        if user and user.password == password_hash:
+        if password_hash == user.password:
             return user
     return None
 
@@ -258,6 +258,21 @@ def api_zavaletaroger_simularprestamo():
 
     except Exception as e:
         return jsonify({"message": str(e), "status": 0}), 500
+
+@app.route("/test_auth", methods=["POST"])
+def test_auth():
+    username = request.json.get("username")
+    password = request.json.get("password")
+    
+    data = controlador_users.obtener_user_por_email(username)
+    password_hash = encstringsha256(password)
+    
+    return jsonify({
+        "user_found": data is not None,
+        "input_hash": password_hash,
+        "stored_hash": data[2] if data else None,
+        "match": data[2] == password_hash if data else False
+    })
 
 ##### APIs - INICIO #####
 
