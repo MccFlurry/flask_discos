@@ -20,9 +20,12 @@ class User(object):
 
 def authenticate(username, password):
     data = controlador_users.obtener_user_por_email(username)
-    user = User(data[0], data[1], data[2])
-    if user and user.password.encode('utf-8') == password.encode('utf-8'):
-        return user
+    if data:
+        user = User(data[0], data[1], data[2])
+        password_hash = encstringsha256(password)
+        if user and user.password == password_hash:
+            return user
+    return None
 
 def identity(payload):
     user_id = payload['identity']
