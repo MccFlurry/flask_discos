@@ -1,0 +1,33 @@
+{% extends "maestra.html" %}
+{% block titulo %}
+Editar artista
+{% endblock %}
+{% block contenido %}
+<section class="section">
+    <div class="columns">
+        <div class="column">
+            <h3 class="is-size-3">Editar artista</h3>
+            <form action="{{url_for('actualizar_artista')}}" method="post">
+                {# Enviar el id en un campo oculto #}
+                <input type="hidden" name="id" value="{{artista[0]}}">
+                <label for="nombre">Nombre:</label>
+                <input value="{{artista[1]}}" required type="text" class="input" placeholder="Nombre" name="nombre" id="nombre">
+                <label for="nacionalidad">Nacionalidad:</label>
+                <input value="{{artista[2]}}" required type="text" class="input" placeholder="Nacionalidad" name="nacionalidad" id="nacionalidad">
+                <label for="aniolanzamiento">Año de lanzamiento</label>
+                <input value="{{artista[3]}}" required type="text" class="input" placeholder="Año de lanzamiento" name="aniolanzamiento" id="aniolanzamiento">
+                <label for="cantidaddiscos">Cantidad discos</label>
+                <input value="{{artista[4]}}" required type="number" class="input" placeholder="Cantidad discos" name="cantidaddiscos" id="cantidaddiscos">
+                <label for="web">Web</label>
+                <input value="{{artista[5]}}" required type="text" class="input" placeholder="Web" name="web" id="web">
+                <label for="redsocialprincipal">Red social principal</label>
+                <input value="{{artista[6]}}" required type="text" class="input" placeholder="Red social principal" name="redsocialprincipal" id="redsocialprincipal">
+                <label for="promediostream">Promedio stream</label>
+                <input value="{{artista[7]}}" required type="number" class="input" placeholder="Promedio stream" name="promediostream" id="promediostream">
+                <button type="submit" class="button is-success mt-2">Guardar</button>
+                <a href="{{url_for('artistas')}}" class="button is-primary mt-2">Volver</a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

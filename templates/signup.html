@@ -1,0 +1,23 @@
+{% extends "maestrageneral.html" %}
+{% block titulo %}
+Registrar usuario
+{% endblock %}
+{% block contenido %}
+<section class="section">
+    <div class="columns">
+        <div class="column is-one-third">
+            <h3 class="is-size-3">Registrar usuario</h3>
+            <form action="{{url_for('registrar_usuario')}}" method="post">
+                <label for="username">Usuario:</label>
+                <input required type="text" class="input" placeholder="Usuario" name="username" id="username">
+                <label for="password">Contraseña:</label>
+                <input required type="password" class="input" placeholder="Contraseña" name="password" id="password">
+                <label for="confpassword">Confirmación de Contraseña:</label>
+                <input required type="password" class="input" placeholder="Confirmación de Contraseña" name="confpassword" id="confpassword">
+                <button type="submit" class="button is-success mt-2">Registrar Usuario</button>
+                <a href="{{url_for('login')}}" class="button is-primary mt-2">Inicio de sesión</a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
