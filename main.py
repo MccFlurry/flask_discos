@@ -6,7 +6,7 @@ import controladores.controlador_users as controlador_users
 import controladores.controlador_simulacion as controlador_simulacion
 import clases.clsDisco as clsDisco
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 ##### SEGURIDAD - INICIO #####
 class User(object):
@@ -19,10 +19,13 @@ class User(object):
         return "User(id='%s')" % self.id
 
 def authenticate(username, password):
+    print(f"Intentando autenticar: {username}")
     data = controlador_users.obtener_user_por_email(username)
     if data:
         user = User(data[0], data[1], data[2])
         password_hash = encstringsha256(password)
+        print(f"Hash generado: {password_hash}")
+        print(f"Hash almacenado: {user.password}")
         if password_hash == user.password:
             return user
     return None
@@ -39,12 +42,25 @@ def encstringsha256(cadena_legible):
     epassword = h.hexdigest()
     return epassword
 
+def custom_auth_response_handler(access_token, identity):
+    token = access_token if isinstance(access_token, str) else access_token.decode('utf-8')
+    return jsonify({
+        'access_token': token
+    })
+
 app = Flask(__name__)
 
 app.debug = True
-app.config['SECRET_KEY'] = 'super-secret'
+app.config.update(
+    SECRET_KEY='super-secret',
+    JWT_AUTH_USERNAME_KEY='email',
+    JWT_AUTH_URL_RULE='/api/auth',
+    JWT_VERIFY_CLAIMS=['signature', 'exp', 'iat'],
+    JWT_EXPIRATION_DELTA=timedelta(seconds=300)
+)
 
 jwt = JWT(app, authenticate, identity)
+jwt.auth_response_handler(custom_auth_response_handler)
 
 ##### SEGURIDAD - FIN #####
 
@@ -274,6 +290,13 @@ def test_auth():
         "match": data[2] == password_hash if data else False
     })
 
+@app.route("/test_hash", methods=["POST"])
+def test_hash():
+    test_password = request.json.get("password", "")
+    return jsonify({
+        "password": test_password,
+        "generated_hash": encstringsha256(test_password)
+    })
 ##### APIs - INICIO #####
 
 ##### APIs - FIN #####
